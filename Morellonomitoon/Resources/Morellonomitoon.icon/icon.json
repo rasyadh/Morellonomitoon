@@ -1,0 +1,47 @@
+{
+  "fill" : {
+    "automatic-gradient" : "display-p3:0.00000,0.00000,0.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Union.svg",
+          "name" : "Union",
+          "position" : {
+            "scale" : 0.5,
+            "translation-in-points" : [
+              -134.86722695393507,
+              0
+            ]
+          }
+        },
+        {
+          "image-name" : "Rectangle 14.svg",
+          "name" : "Rectangle 14",
+          "position" : {
+            "scale" : 0.5,
+            "translation-in-points" : [
+              135.04425768202168,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
