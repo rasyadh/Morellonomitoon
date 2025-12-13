@@ -39,3 +39,17 @@ enum MangaFetcherError: Error {
     case missingRequiredData
     case invalidURL
 }
+
+public enum MangaSources: String, CaseIterable, Codable, Identifiable {
+    case mangabat
+    case komiku
+    
+    public var id: String { rawValue }
+    
+    public var title: String {
+        switch self {
+        case .mangabat: return "Mangabat"
+        case .komiku: return "Komiku"
+        }
+    }
+}

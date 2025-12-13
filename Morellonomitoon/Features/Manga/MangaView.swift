@@ -55,7 +55,7 @@ struct MangaView: View {
                             store.sort == .desc ?
                                 .primary : AppColors.primary,
                             store.sort == .desc ?
-                            AppColors.primary : .primary
+                                AppColors.primary : .primary
                         )
                 }
             }

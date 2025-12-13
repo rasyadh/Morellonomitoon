@@ -76,15 +76,23 @@ struct HomeView: View {
             }
             .navigationTitle("Morellonomitoon")
             .toolbarTitleDisplayMode(.inlineLarge)
+            .sheet(item: $store.scope(
+                state: \.destination?.settingSheet,
+                action: \.destination.settingSheet
+            )) { settingSheetStore in
+                NavigationStack {
+                    SettingSheet(store: settingSheetStore)
+                }
+            }
             .refreshable {
                 store.send(.refresh)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        
+                        store.send(.settingTapped)
                     } label: {
-                        Image(systemName: "person.circle.fill")
+                        Image(systemName: "gearshape.fill")
                             .foregroundStyle(.primary)
                     }
                 }

@@ -40,6 +40,7 @@ struct MangaFeature {
         case bookmarkTapped
         
         case mangaResponse(Result<Manga, ResultError>)
+        case settingLoaded(Setting?)
         case loadBookmark(String)
         case bookmarkLoaded(Manga?)
         
@@ -57,7 +58,7 @@ struct MangaFeature {
                 
             case .refresh:
                 state.loadingState = .loading
-                return fetchManga(slug: state.id)
+                return fetchSetting()
                 
             case .onMoreTapped:
                 state.destination = .mangaInfoSheet(
@@ -79,7 +80,13 @@ struct MangaFeature {
                 )
                 
             case let .mangaResponse(.success(result)):
-                state.manga = result
+                if state.sort == .asc {
+                    state.manga = result.copy(
+                        chapters: result.chapters?.reversed()
+                    )
+                } else {
+                    state.manga = result
+                }
                 state.loadingState = .loaded
                 return .send(.loadBookmark(result.id))
                 
@@ -93,6 +100,10 @@ struct MangaFeature {
             case let .bookmarkLoaded(bookmark):
                 state.bookmark = bookmark
                 return .none
+                
+            case let .settingLoaded(setting):
+                state.sort = setting.isChapterAsc ? .asc : .desc
+                return fetchManga(slug: state.id)
                 
             case .chapterTapped:
                 return .none
@@ -166,6 +177,21 @@ struct MangaFeature {
             } else {
                 try await databaseService.saveBookmark(manga: manga)
                 await send(.loadBookmark(manga.id))
+            }
+        }
+    }
+    
+    private func fetchSetting() -> Effect<Action> {
+        .run { [databaseService] send in
+            do {
+                guard let setting = try await databaseService.fetchSetting() else {
+                    await send(.settingLoaded(nil))
+                    
+                    return
+                }
+                await send(.settingLoaded(setting))
+            } catch {
+                await send(.settingLoaded(nil))
             }
         }
     }
