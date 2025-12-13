@@ -30,6 +30,8 @@ struct TabFeature {
     
     enum Action {
         case selectTab(AppTab)
+        case quickActionReceived(QuickActionType)
+        
         case home(HomeFeature.Action)
         case explore(ExploreFeature.Action)
         case bookmark(BookmarkFeature.Action)
@@ -54,12 +56,25 @@ struct TabFeature {
                 state.selectedTab = tab
                 return .none
                 
+            case let .quickActionReceived(type):
+                state.selectedTab = mapQuickAction(type)
+                return .none
+                
             case .home(_), .explore(_), .bookmark(_), .search(_):
                 return .none
                 
             case .delegate:
                 return .none
             }
+        }
+    }
+    
+    private func mapQuickAction(_ type: QuickActionType) -> AppTab {
+        switch type {
+        case .bookmark:
+            return .bookmark
+        case .search:
+            return .search
         }
     }
 }

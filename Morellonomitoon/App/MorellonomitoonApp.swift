@@ -12,6 +12,8 @@ import SwiftData
 @main
 struct MorellonomitoonApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     static let store = Store(initialState: AppFeature.State()) {
         AppFeature()
     }

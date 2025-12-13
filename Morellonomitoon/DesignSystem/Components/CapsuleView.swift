@@ -43,7 +43,7 @@ struct CapsuleView: View {
             .padding(.vertical, Space.xs)
             .foregroundStyle(.white)
             .glassEffect(
-                .clear.tint(type.color).interactive(),
+                .regular.tint(type.color).interactive(),
                 in: .rect(cornerRadius: 8)
             )
     }

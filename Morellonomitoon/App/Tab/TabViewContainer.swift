@@ -20,6 +20,7 @@ struct TabViewContainer: View {
                 value: AppTab.home
             ) {
                 HomeView(store: store.scope(state: \.home, action: \.home))
+                    .tint(.primary)
             }
             
             Tab(
@@ -28,6 +29,7 @@ struct TabViewContainer: View {
                 value: AppTab.explore
             ) {
                 ExploreView(store: store.scope(state: \.explore, action: \.explore))
+                    .tint(.primary)
             }
             
             Tab(
@@ -36,6 +38,7 @@ struct TabViewContainer: View {
                 value: AppTab.bookmark
             ) {
                 BookmarkView(store: store.scope(state: \.bookmark, action: \.bookmark))
+                    .tint(.primary)
             }
             
             Tab(
@@ -48,6 +51,7 @@ struct TabViewContainer: View {
                     SearchView(
                         store: store.scope(state: \.search, action: \.search)
                     )
+                    .tint(.primary)
                 }
             }
         }
