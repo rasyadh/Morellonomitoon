@@ -46,7 +46,7 @@ struct ChapterSheetView: View {
                     store.send(.cancelButtonTapped)
                 } label: {
                     Image(systemName: "multiply.circle")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }

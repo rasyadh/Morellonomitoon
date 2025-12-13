@@ -40,5 +40,4 @@ struct AppView: View {
         
     )
     .preferredColorScheme(.dark)
-    .tint(AppColors.primary)
 }

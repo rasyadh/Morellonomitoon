@@ -54,7 +54,7 @@ struct ChapterListView: View {
                     .contentShape(RoundedRectangle(cornerRadius: 16))
                     .glassEffect(
                         latestReadChapterURL == chapter.url ?
-                            .clear.tint(AppColors.primary.opacity(0.3)).interactive() : .regular.interactive(),
+                            .regular.tint(AppColors.primary.opacity(0.3)).interactive() : .regular.interactive(),
                         in: .rect(cornerRadius: 16)
                     )
                 }

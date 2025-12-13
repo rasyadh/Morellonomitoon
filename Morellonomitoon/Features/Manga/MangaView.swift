@@ -53,9 +53,9 @@ struct MangaView: View {
                         .symbolRenderingMode(.palette)
                         .foregroundStyle(
                             store.sort == .desc ?
-                                .white : AppColors.primary,
+                                .primary : AppColors.primary,
                             store.sort == .desc ?
-                            AppColors.primary : .white
+                            AppColors.primary : .primary
                         )
                 }
             }
@@ -71,7 +71,7 @@ struct MangaView: View {
                             .foregroundStyle(AppColors.primary)
                     } else {
                         Image(systemName: "bookmark")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
@@ -80,7 +80,7 @@ struct MangaView: View {
                 ToolbarItem {
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }

@@ -93,7 +93,7 @@ struct MangaHeaderSectionView: View {
                                     .padding(.horizontal, Space.md)
                                     .padding(.vertical, Space.sm)
                             }
-                            .glassEffect(.clear.interactive())
+                            .glassEffect(.regular.interactive())
                         }
                         .padding(.vertical, Space.xs)
                     }

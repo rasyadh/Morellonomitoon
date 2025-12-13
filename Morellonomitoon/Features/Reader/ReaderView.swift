@@ -48,7 +48,7 @@ struct ReaderView: View {
                     store.send(.chapterToolbarTapped)
                 } label: {
                     Image(systemName: "list.bullet.below.rectangle")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
             
@@ -58,7 +58,7 @@ struct ReaderView: View {
                         store.send(.previousChapterTapped(prev))
                     } label: {
                         Image(systemName: "chevron.left")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
@@ -69,7 +69,7 @@ struct ReaderView: View {
                         store.send(.nextChapterTapped(next))
                     } label: {
                         Image(systemName: "chevron.right")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
