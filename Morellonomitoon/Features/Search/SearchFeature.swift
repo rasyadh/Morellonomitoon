@@ -24,7 +24,7 @@ struct SearchFeature {
         var matchedSourceID: String = ""
         
         var page: Int = 1
-        let maxPage: Int = 10
+        var hasMore: Bool = true
         var isLoadingMore: Bool = false
     }
     
@@ -54,7 +54,7 @@ struct SearchFeature {
         BindingReducer()
         
         Reduce { state, action in
-            switch action {    
+            switch action {
             case .onAppear:
                 if state.loadingState == .loaded {
                     return .none
@@ -66,19 +66,24 @@ struct SearchFeature {
             case let .submitSearch(text):
                 guard !text.isEmpty else { return .none }
                 
-                // remove duplicates
-                state.recentSearches.removeAll { $0 == text }
-                // prepend new term
-                state.recentSearches.insert(text, at: 0)
-                // limit size
-                state.recentSearches = Array(state.recentSearches.prefix(5))
+                state.page = 1
+                state.hasMore = true
+                state.isLoadingMore = false
+                state.mangas.removeAll()
                 
+                state.recentSearches.removeAll { $0 == text }
+                state.recentSearches.insert(text, at: 0)
+                state.recentSearches = Array(state.recentSearches.prefix(5))
                 userDefaults.saveStringArray(recentKey, state.recentSearches)
+                
                 state.loadingState = .loading
                 return fetchSearchManga(by: text)
                 
             case .cancelSearch:
                 state.mangas.removeAll()
+                state.page = 1
+                state.hasMore = true
+                state.isLoadingMore = false
                 state.loadingState = .idle
                 return .send(.onAppear)
                 
@@ -92,6 +97,10 @@ struct SearchFeature {
                 return .send(.submitSearch(text))
                 
             case let .searchResponse(.success(result)):
+                if result.isEmpty {
+                    state.hasMore = false
+                }
+                
                 if state.isLoadingMore {
                     state.mangas.append(contentsOf: result)
                     state.isLoadingMore = false
@@ -120,21 +129,28 @@ struct SearchFeature {
                 )))
                 return .none
                 
+            case let .path(.element(id: _, action: .manga(.genreTapped(param)))):
+                state.path.append(.genericExplore(GenericExploreFeature.State(
+                    id: param.id,
+                    name: param.name,
+                    type: param.type
+                )))
+                return .none
+                
+            case let .path(.element(id: _, action: .genericExplore(.mangaTapped(id)))):
+                state.matchedSourceID = id
+                state.path.append(.manga(MangaFeature.State(id: id)))
+                return .none
+                
             case .loadMore:
-                if state.page >= state.maxPage {
-                    state.isLoadingMore = false
-                    return .none
-                }
-                
-                if state.isLoadingMore { return .none }
-                
+                guard state.hasMore, !state.isLoadingMore else { return .none }
                 state.isLoadingMore = true
                 state.page += 1
                 return fetchSearchManga(by: state.query, page: state.page)
                 
             case .binding:
                 return .none
-            
+                
             case .path:
                 return .none
             }
@@ -162,6 +178,7 @@ extension SearchFeature {
     enum Path {
         case manga(MangaFeature)
         case reader(ReaderFeature)
+        case genericExplore(GenericExploreFeature)
     }
 }
 

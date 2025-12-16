@@ -18,6 +18,8 @@ struct DatabaseService {
         self.context = context
     }
     
+    // MARK: - Bookmark
+    
     func fetchBookmarks() throws -> [MangaEntity] {
         let descriptor = FetchDescriptor<MangaEntity>(
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
@@ -64,6 +66,33 @@ struct DatabaseService {
             try context.save()
         }
     }
+    
+    // MARK: - Setting
+    
+    func fetchSetting() throws -> Setting? {
+        let descriptor = FetchDescriptor<SettingEntity>()
+        let settingEntity = try context.fetch(descriptor).first
+        
+        return settingEntity?.toDTO()
+    }
+    
+    func saveSetting(setting: Setting) throws {
+        let descriptor = FetchDescriptor<SettingEntity>()
+        let entity = try context.fetch(descriptor).first
+        
+        if let entity {
+            entity.chapterOrderAscending = setting.chapterOrderAscending
+            entity.mangaSource = setting.mangaSource
+        } else {
+            let entity = SettingEntity(
+                chapterOrderAscending: setting.chapterOrderAscending,
+                mangaSource: setting.mangaSource
+            )
+            context.insert(entity)
+        }
+        
+        try context.save()
+    }
 }
 
 extension DependencyValues {
@@ -79,7 +108,9 @@ private struct DatabaseServiceKey: DependencyKey {
     static let liveValue: DatabaseService = {
         do {
             // Configure your model container for the live environment
-            let container = try ModelContainer(for: MangaEntity.self)
+            let container = try ModelContainer(
+                for: MangaEntity.self, SettingEntity.self
+            )
             return DatabaseService(context: ModelContext(container))
         } catch {
             fatalError()
@@ -91,7 +122,7 @@ private struct DatabaseServiceKey: DependencyKey {
         do {
             // In a test environment, you can use an in-memory container
             let container = try ModelContainer(
-                for: MangaEntity.self,
+                for: MangaEntity.self, SettingEntity.self,
                 configurations: ModelConfiguration(isStoredInMemoryOnly: true)
             )
             return DatabaseService(context: ModelContext(container))

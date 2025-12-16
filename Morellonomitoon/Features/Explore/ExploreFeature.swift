@@ -117,6 +117,14 @@ struct ExploreFeature {
                 )))
                 return .none
                 
+            case let .path(.element(id: _, action: .manga(.genreTapped(param)))):
+                state.path.append(.genericExplore(GenericExploreFeature.State(
+                    id: param.id,
+                    name: param.name,
+                    type: param.type
+                )))
+                return .none
+                
             case let .destination(.presented(.genreSheet(.genreTapped(param)))):
                 state.destination = nil
                 state.path.append(.genericExplore(GenericExploreFeature.State(

@@ -24,7 +24,7 @@ struct ReaderView: View {
                                     .resizable()
                                     .scaledToFill()
                             } placeholder: {
-                                RoundedRectangle(cornerRadius: 12)
+                                Rectangle()
                                     .fill(.gray.opacity(0.2))
                                     .frame(height: 420)
                             }

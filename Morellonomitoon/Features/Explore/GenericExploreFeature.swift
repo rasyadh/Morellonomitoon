@@ -22,7 +22,7 @@ struct GenericExploreFeature {
         var mangaSourceID: String = ""
         
         var page: Int = 1
-        let maxPage: Int = 10
+        var hasMore: Bool = true
         var isLoadingMore: Bool = false
     }
     
@@ -47,6 +47,9 @@ struct GenericExploreFeature {
                 
             case .refresh:
                 state.loadingState = .loading
+                state.page = 1
+                state.hasMore = true
+                state.isLoadingMore = false
                 return fetchGenerateById(id: state.id, type: state.type)
                 
             case let .mangaTapped(id):
@@ -54,6 +57,13 @@ struct GenericExploreFeature {
                 return .none
                 
             case let .mangaByGenreResponse(.success(mangas)):
+                if mangas.isEmpty {
+                    state.hasMore = false
+                    state.isLoadingMore = false
+                    state.loadingState = .loaded
+                    return .none
+                }
+                
                 if state.isLoadingMore {
                     state.mangas.append(contentsOf: IdentifiedArrayOf(uniqueElements: mangas))
                     state.isLoadingMore = false
@@ -68,13 +78,7 @@ struct GenericExploreFeature {
                 return .none
                 
             case .loadMore:
-                if state.page >= state.maxPage {
-                    state.isLoadingMore = false
-                    return .none
-                }
-                
-                if state.isLoadingMore { return .none }
-                
+                guard state.hasMore, !state.isLoadingMore else { return .none }
                 state.isLoadingMore = true
                 state.page += 1
                 return onLoadMore(id: state.id, type: state.type, page: state.page)

@@ -89,7 +89,7 @@ struct MangaHeaderSectionView: View {
                                 Text("MORE")
                                     .font(.callout)
                                     .fontWeight(.medium)
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.primary)
                                     .padding(.horizontal, Space.md)
                                     .padding(.vertical, Space.sm)
                             }
@@ -128,7 +128,8 @@ struct MangaHeaderSectionView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, Space.md)
             }
             .frame(height: sizeHeight)
             .offset(y: minY > 0 ? -minY : 0)

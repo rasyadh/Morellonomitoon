@@ -32,14 +32,15 @@ struct MangaFeature {
     
     enum Action {
         case onAppear
-        case onDisappear
         case refresh
         case onMoreTapped
         case chapterTapped(ChapterParam)
         case sortTapped
         case bookmarkTapped
+        case genreTapped(GenericExploreParam)
         
         case mangaResponse(Result<Manga, ResultError>)
+        case settingLoaded(Setting?)
         case loadBookmark(String)
         case bookmarkLoaded(Manga?)
         
@@ -57,7 +58,7 @@ struct MangaFeature {
                 
             case .refresh:
                 state.loadingState = .loading
-                return fetchManga(slug: state.id)
+                return fetchSetting()
                 
             case .onMoreTapped:
                 state.destination = .mangaInfoSheet(
@@ -79,7 +80,13 @@ struct MangaFeature {
                 )
                 
             case let .mangaResponse(.success(result)):
-                state.manga = result
+                if state.sort == .asc {
+                    state.manga = result.copy(
+                        chapters: result.chapters?.reversed()
+                    )
+                } else {
+                    state.manga = result
+                }
                 state.loadingState = .loaded
                 return .send(.loadBookmark(result.id))
                 
@@ -94,13 +101,21 @@ struct MangaFeature {
                 state.bookmark = bookmark
                 return .none
                 
+            case let .settingLoaded(setting):
+                state.sort = setting.isChapterAsc ? .asc : .desc
+                return fetchManga(slug: state.id)
+                
             case .chapterTapped:
                 return .none
                 
-            case .destination:
+            case .genreTapped:
                 return .none
                 
-            default:
+            case let .destination(.presented(.mangaInfoSheet(.genreTapped(param)))):
+                state.destination = nil
+                return .send(.genreTapped(param))
+                
+            case .destination:
                 return .none
             }
         }
@@ -166,6 +181,21 @@ struct MangaFeature {
             } else {
                 try await databaseService.saveBookmark(manga: manga)
                 await send(.loadBookmark(manga.id))
+            }
+        }
+    }
+    
+    private func fetchSetting() -> Effect<Action> {
+        .run { [databaseService] send in
+            do {
+                guard let setting = try await databaseService.fetchSetting() else {
+                    await send(.settingLoaded(nil))
+                    
+                    return
+                }
+                await send(.settingLoaded(setting))
+            } catch {
+                await send(.settingLoaded(nil))
             }
         }
     }

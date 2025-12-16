@@ -31,10 +31,24 @@ struct MangaInfoSheet: View {
                     }
                     
                     if !store.manga.genres.isEmpty {
-                        Text(store.manga.genresString)
-                            .font(.subheadline)
-                            .foregroundStyle(.primary.opacity(0.7))
-                            .multilineTextAlignment(.center)
+                        FlowLayoutView(spacing: Space.xs, lineSpacing: Space.sm, alignment: .center) {
+                            ForEach(store.manga.genres) { genre in
+                                Button {
+                                    store.send(.genreTapped(GenericExploreParam(
+                                        id: genre.id, name: genre.name, type: .genre
+                                    )))
+                                } label: {
+                                    Text(genre.name)
+                                        .font(.callout)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, Space.md)
+                                        .padding(.vertical, Space.sm)
+                                }
+                                .glassEffect(.regular.interactive())
+                            }
+                        }
                     }
                     
                     HStack(alignment: .center, spacing: Space.md) {

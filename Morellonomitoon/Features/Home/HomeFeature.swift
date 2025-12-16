@@ -25,8 +25,9 @@ struct HomeFeature {
             IdentifiedArrayOf(uniqueElements: popularManga.dropFirst())
         }
         
-        var path = StackState<Path.State>()
         var matchedSourceID: String = ""
+        var path = StackState<Path.State>()
+        @Presents var destination: Destination.State?
     }
     
     struct HomeMangaResponse: Equatable, Sendable {
@@ -40,9 +41,11 @@ struct HomeFeature {
         case mangaResponse(Result<HomeMangaResponse, ResultError>)
         case mangaTapped(String)
         case genericExploreTapped(GenericExploreParam)
+        case settingTapped
         case setMatchedSourceID(String)
         
         case path(StackAction<Path.State, Path.Action>)
+        case destination(PresentationAction<Destination.Action>)
     }
     
     @Dependency(\.sourceManager) private var sourceManager
@@ -82,6 +85,12 @@ struct HomeFeature {
                 )))
                 return .none
                 
+            case .settingTapped:
+                state.destination = .settingSheet(
+                    SettingSheetFeature.State()
+                )
+                return .none
+                
             case let .setMatchedSourceID(id):
                 state.matchedSourceID = id
                 return .none
@@ -93,10 +102,27 @@ struct HomeFeature {
                 )))
                 return .none
                 
+            case let .path(.element(id: _, action: .manga(.genreTapped(param)))):
+                state.path.append(.genericExplore(GenericExploreFeature.State(
+                    id: param.id,
+                    name: param.name,
+                    type: param.type
+                )))
+                return .none
+                
+            case let .path(.element(id: _, action: .genericExplore(.mangaTapped(id)))):
+                state.matchedSourceID = id
+                state.path.append(.manga(MangaFeature.State(id: id)))
+                return .none
+                
             case .path:
+                return .none
+                
+            case .destination:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         .forEach(\.path, action: \.path)
     }
     
@@ -130,6 +156,13 @@ extension HomeFeature {
         case reader(ReaderFeature)
         case genericExplore(GenericExploreFeature)
     }
+    
+    @Reducer
+    enum Destination {
+        case settingSheet(SettingSheetFeature)
+    }
 }
 
 extension HomeFeature.Path.State: Equatable {}
+
+extension HomeFeature.Destination.State: Equatable {}

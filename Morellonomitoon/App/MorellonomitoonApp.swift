@@ -23,6 +23,9 @@ struct MorellonomitoonApp: App {
             AppView(store: MorellonomitoonApp.store)
             .preferredColorScheme(.dark)
         }
-        .modelContainer(for: MangaEntity.self)
+        .modelContainer(for: [
+            MangaEntity.self,
+            SettingEntity.self
+        ])
     }
 }

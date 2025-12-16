@@ -24,13 +24,44 @@ struct MangaView: View {
                     store.send(.onMoreTapped)
                 }
                 
+                if let bookmark = store.bookmark,
+                    let latestChapter = bookmark.latestChapter {
+                    VStack {
+                        Button {
+                            guard let chapterId = bookmark.latestChapterURL?.extractmangaBatChapterSlug else {
+                                return
+                            }
+                            onTapChapter(param: ChapterParam(
+                                mangaID: bookmark.id, chapterID: chapterId)
+                            )
+                        } label: {
+                            HStack(alignment: .center, spacing: Space.sm) {
+                                Image(systemName: "book.pages")
+                                    .foregroundStyle(.primary)
+                                
+                                Text("Continue Read \(latestChapter)")
+                                    .font(.default)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.primary)
+                            }
+                            .padding()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .glassEffect(
+                            .regular.tint(AppColors.primary.opacity(0.3)).interactive(),
+                            in: .rect(cornerRadius: 16)
+                        )
+                    }
+                    .padding(.horizontal)
+                }
+                
                 if let chapters = store.manga.chapters {
                     ChapterListView(
                         namespace: namespace,
                         chapters: chapters,
                         latestReadChapterURL: store.bookmark?.latestChapterURL
                     ) { param in
-                        store.send(.chapterTapped(param))
+                        onTapChapter(param: param)
                     }
                 }
                 
@@ -55,7 +86,7 @@ struct MangaView: View {
                             store.sort == .desc ?
                                 .primary : AppColors.primary,
                             store.sort == .desc ?
-                            AppColors.primary : .primary
+                                AppColors.primary : .primary
                         )
                 }
             }
@@ -99,6 +130,10 @@ struct MangaView: View {
         .task {
             store.send(.onAppear)
         }
+    }
+    
+    private func onTapChapter(param: ChapterParam) {
+        store.send(.chapterTapped(param))
     }
 }
 
