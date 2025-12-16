@@ -40,7 +40,7 @@ struct GenericExploreView: View {
                             store.send(.mangaTapped(manga.id))
                         }
                         .onAppear {
-                            if manga.id == store.mangas.last?.id && store.page < store.maxPage {
+                            if manga.id == store.mangas.last?.id {
                                 store.send(.loadMore)
                             }
                         }
@@ -61,11 +61,11 @@ struct GenericExploreView: View {
                 LoadingView()
             }
         }
-        .navigationTitle(store.name)
+        .navigationTitle(store.name.capitalized)
         .refreshable {
             store.send(.refresh)
         }
-        .task {
+        .task(id: "task-generic-explore-\(store.id)") {
             store.send(.onAppear)
         }
     }

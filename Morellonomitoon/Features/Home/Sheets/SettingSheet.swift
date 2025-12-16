@@ -23,15 +23,6 @@ struct SettingSheet: View {
                 .onChange(of: store.isChapterOrderAsc) { _, newValue in
                     store.send(.onChangeChapterOrder(newValue))
                 }
-                
-                Toggle(
-                    "Reader style (vertical)",
-                    isOn: $store.isReaderVertical
-                )
-                .tint(AppColors.primary)
-                .onChange(of: store.isReaderVertical) { _, newValue in
-                    store.send(.onChangeReaderVertical(newValue))
-                }
             }
             
             Section("Source") {

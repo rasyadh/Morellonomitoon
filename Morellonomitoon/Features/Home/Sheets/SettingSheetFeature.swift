@@ -16,7 +16,6 @@ struct SettingSheetFeature {
     @ObservableState
     struct State: Equatable {
         var isChapterOrderAsc: Bool = false
-        var isReaderVertical: Bool = true
         var mangaSource: MangaSources = .mangabat
     }
     
@@ -25,7 +24,6 @@ struct SettingSheetFeature {
         case onAppear
         case cancelButtonTapped
         case onChangeChapterOrder(Bool)
-        case onChangeReaderVertical(Bool)
         case selectMangaSource(MangaSources)
         case settingResponse(Result<Setting, ResultError>)
     }
@@ -44,27 +42,17 @@ struct SettingSheetFeature {
             case let .onChangeChapterOrder(value):
                 return saveSetting(
                     isChapterOrderAsc: value,
-                    isReaderVertical: state.isReaderVertical,
-                    mangaSource: state.mangaSource
-                )
-                
-            case let .onChangeReaderVertical(value):
-                return saveSetting(
-                    isChapterOrderAsc: state.isChapterOrderAsc,
-                    isReaderVertical: value,
                     mangaSource: state.mangaSource
                 )
                 
             case let .selectMangaSource(value):
                 return saveSetting(
                     isChapterOrderAsc: state.isChapterOrderAsc,
-                    isReaderVertical: state.isReaderVertical,
                     mangaSource: value
                 )
                 
             case let .settingResponse(.success(result)):
                 state.isChapterOrderAsc = result.chapterOrderAscending
-                state.isReaderVertical = result.isVerticalReader
                 state.mangaSource = result.mangaSource
                 return .none
                 
@@ -94,11 +82,10 @@ struct SettingSheetFeature {
         }
     }
     
-    private func saveSetting(isChapterOrderAsc: Bool, isReaderVertical: Bool, mangaSource: MangaSources) -> Effect<Action> {
+    private func saveSetting(isChapterOrderAsc: Bool, mangaSource: MangaSources) -> Effect<Action> {
         .run { [databaseService] send in
             try await databaseService.saveSetting(setting: Setting(
                 chapterOrderAscending: isChapterOrderAsc,
-                isVerticalReader: isReaderVertical,
                 mangaSource: mangaSource
             ))
         }

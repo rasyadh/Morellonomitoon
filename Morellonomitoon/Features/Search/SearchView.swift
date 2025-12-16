@@ -12,7 +12,6 @@ struct SearchView: View {
     
     @Bindable var store: StoreOf<SearchFeature>
     @Namespace private var namespace
-    @Environment(\.isSearching) private var isSearching: Bool
     
     var body: some View {
         NavigationStackStore(
@@ -45,7 +44,7 @@ struct SearchView: View {
                                     onNavigateManga(manga)
                                 }
                                 .onAppear {
-                                    if manga.id == store.mangas.last?.id && store.page < store.maxPage {
+                                    if manga.id == store.mangas.last?.id {
                                         store.send(.loadMore)
                                     }
                                 }
@@ -88,7 +87,7 @@ struct SearchView: View {
                 store.send(.submitSearch(store.query))
             })
             .onChange(of: store.query, { oldValue, newValue in
-                if store.query.isEmpty && !isSearching {
+                if newValue.isEmpty {
                     store.send(.cancelSearch)
                 }
             })
@@ -105,6 +104,12 @@ struct SearchView: View {
                 
             case .reader(let readerStore):
                 ReaderView(store: readerStore)
+                    .navigationTransition(
+                        .zoom(sourceID: self.store.matchedSourceID, in: namespace)
+                    )
+                
+            case .genericExplore(let genericExploreStore):
+                GenericExploreView(namespace: namespace, store: genericExploreStore)
                     .navigationTransition(
                         .zoom(sourceID: self.store.matchedSourceID, in: namespace)
                     )

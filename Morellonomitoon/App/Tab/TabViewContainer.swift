@@ -47,12 +47,8 @@ struct TabViewContainer: View {
                 value: AppTab.search,
                 role: .search
             ) {
-                NavigationStack {
-                    SearchView(
-                        store: store.scope(state: \.search, action: \.search)
-                    )
+                SearchView(store: store.scope(state: \.search, action: \.search))
                     .tint(.primary)
-                }
             }
         }
         .tabViewStyle(.sidebarAdaptable)

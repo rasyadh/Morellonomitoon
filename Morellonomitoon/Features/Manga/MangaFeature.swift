@@ -32,12 +32,12 @@ struct MangaFeature {
     
     enum Action {
         case onAppear
-        case onDisappear
         case refresh
         case onMoreTapped
         case chapterTapped(ChapterParam)
         case sortTapped
         case bookmarkTapped
+        case genreTapped(GenericExploreParam)
         
         case mangaResponse(Result<Manga, ResultError>)
         case settingLoaded(Setting?)
@@ -108,10 +108,14 @@ struct MangaFeature {
             case .chapterTapped:
                 return .none
                 
-            case .destination:
+            case .genreTapped:
                 return .none
                 
-            default:
+            case let .destination(.presented(.mangaInfoSheet(.genreTapped(param)))):
+                state.destination = nil
+                return .send(.genreTapped(param))
+                
+            case .destination:
                 return .none
             }
         }

@@ -70,7 +70,7 @@ final class MangabatClient: MangaSource {
                 !mangaUrl.isEmpty,
                 let thumbnailURL = URL(string: imageUrl),
                 let url = URL(string: mangaUrl),
-                let slugID = url.extractMangabatSlug,
+                let slugID = url.extractmangaBatMangaSlug,
                 let latestChapterURL = URL(string: latestChapterUrl) else {
                 continue
             }
@@ -101,9 +101,11 @@ final class MangabatClient: MangaSource {
         
         let request = try createURLRequest(urlString: url)
         let data = try await http.send(request)
-        let doc = try HTMLParser.document(from: data)
+        guard !data.isEmpty, let doc = try? HTMLParser.document(from: data) else {
+            return []
+        }
         
-        return try await parseMangaItems(document: doc)
+        return (try? await parseMangaItems(document: doc)) ?? []
     }
     
     // MARK: - Hotest Manga
@@ -116,9 +118,11 @@ final class MangabatClient: MangaSource {
         
         let request = try createURLRequest(urlString: url)
         let data = try await http.send(request)
-        let doc = try HTMLParser.document(from: data)
+        guard !data.isEmpty, let doc = try? HTMLParser.document(from: data) else {
+            return []
+        }
         
-        return try await parseMangaItems(document: doc)
+        return (try? await parseMangaItems(document: doc)) ?? []
     }
     
     // MARK: - Newest Manga
@@ -131,9 +135,11 @@ final class MangabatClient: MangaSource {
         
         let request = try createURLRequest(urlString: url)
         let data = try await http.send(request)
-        let doc = try HTMLParser.document(from: data)
+        guard !data.isEmpty, let doc = try? HTMLParser.document(from: data) else {
+            return []
+        }
         
-        return try await parseMangaItems(document: doc)
+        return (try? await parseMangaItems(document: doc)) ?? []
     }
     
     // MARK: - Genre
@@ -187,7 +193,7 @@ final class MangabatClient: MangaSource {
         let doc = try HTMLParser.document(from: data)
         
         let mangaInfoPicEl = try doc.select("div.manga-info-top")
-
+        
         let imgEl = try mangaInfoPicEl.select("div.manga-info-pic > img").first()
         let imageUrl = try imgEl?.attr("src") ?? ""
         
@@ -290,9 +296,11 @@ final class MangabatClient: MangaSource {
         
         let request = try createURLRequest(urlString: url)
         let data = try await http.send(request)
-        let doc = try HTMLParser.document(from: data)
+        guard !data.isEmpty, let doc = try? HTMLParser.document(from: data) else {
+            return []
+        }
         
-        return try await parseMangaItems(document: doc)
+        return (try? await parseMangaItems(document: doc)) ?? []
     }
     
     // MARK: - Manga Chapter
@@ -378,9 +386,13 @@ final class MangabatClient: MangaSource {
         
         let request = try createURLRequest(urlString: url)
         let data = try await http.send(request)
-        let doc = try HTMLParser.document(from: data)
+        guard !data.isEmpty, let doc = try? HTMLParser.document(from: data) else {
+            return []
+        }
         
-        let items = try doc.select("div.panel_story_list > div.story_item")
+        guard let items = try? doc.select("div.panel_story_list > div.story_item") else {
+            return []
+        }
         
         var results: [Manga] = []
         
@@ -402,7 +414,7 @@ final class MangabatClient: MangaSource {
                 let imageURL = imageUrl,
                 let thumbnailURL = URL(string: imageURL),
                 let url = URL(string: mangaUrl),
-                let slugID = url.extractMangabatSlug,
+                let slugID = url.extractmangaBatMangaSlug,
                 let latestChapterURL = URL(string: latestChapterUrl)
             else {
                 continue
@@ -427,7 +439,9 @@ final class MangabatClient: MangaSource {
 extension MangabatClient {
     
     private func parseMangaItems(document doc: Document) async throws -> [Manga] {
-        let items = try doc.select("div.comic-list > div.list-comic-item-wrap")
+        guard let items = try? doc.select("div.comic-list > div.list-comic-item-wrap") else {
+            return []
+        }
         
         var results: [Manga] = []
         
@@ -450,7 +464,7 @@ extension MangabatClient {
                 !mangaUrl.isEmpty,
                 let thumbnailURL = URL(string: imageUrl),
                 let url = URL(string: mangaUrl),
-                let slugID = url.extractMangabatSlug,
+                let slugID = url.extractmangaBatMangaSlug,
                 let latestChapterURL = URL(string: latestChapterUrl)
             else {
                 continue
@@ -522,13 +536,32 @@ extension MangabatClient {
 extension URL {
     /// Extracts the manga slug from a URL like:
     /// https://www.mangabats.com/manga/one-piece
-    var extractMangabatSlug: String? {
+    var extractmangaBatMangaSlug: String? {
         let components = path
             .split(separator: "/")
             .map { String($0) }
         
         // Expected: ["manga", "one-piece"]
         guard components.count >= 2 else {
+            return nil
+        }
+        
+        guard components.contains("manga") else {
+            return nil
+        }
+        
+        return components.last
+    }
+    
+    /// Extracts the chapter slug from a URL like:
+    /// https://www.mangabats.com/manga/one-piece/chapter-1
+    var extractmangaBatChapterSlug: String? {
+        let components = path
+            .split(separator: "/")
+            .map { String($0) }
+        
+        // Expected: ["manga", "one-piece"]
+        guard components.count >= 3 else {
             return nil
         }
         

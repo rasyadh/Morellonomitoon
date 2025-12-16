@@ -82,12 +82,10 @@ struct DatabaseService {
         
         if let entity {
             entity.chapterOrderAscending = setting.chapterOrderAscending
-            entity.isVerticalReader = setting.isVerticalReader
             entity.mangaSource = setting.mangaSource
         } else {
             let entity = SettingEntity(
                 chapterOrderAscending: setting.chapterOrderAscending,
-                isVerticalReader: setting.isVerticalReader,
                 mangaSource: setting.mangaSource
             )
             context.insert(entity)

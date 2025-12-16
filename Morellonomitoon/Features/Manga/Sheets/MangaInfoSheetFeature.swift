@@ -19,6 +19,7 @@ struct MangaInfoSheetFeature {
     enum Action {
         case onAppear
         case cancelButtonTapped
+        case genreTapped(GenericExploreParam)
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -31,6 +32,9 @@ struct MangaInfoSheetFeature {
                 
             case .cancelButtonTapped:
                 return .run { _ in await self.dismiss() }
+                
+            case .genreTapped:
+                return .none
             }
         }
     }

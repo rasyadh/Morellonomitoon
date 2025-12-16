@@ -73,6 +73,12 @@ struct BookmarkView: View {
                     .navigationTransition(
                         .zoom(sourceID: self.store.matchedSourceID, in: namespace)
                     )
+                
+            case .genericExplore(let genericExploreStore):
+                GenericExploreView(namespace: namespace, store: genericExploreStore)
+                    .navigationTransition(
+                        .zoom(sourceID: self.store.matchedSourceID, in: namespace)
+                    )
             }
         }
     }

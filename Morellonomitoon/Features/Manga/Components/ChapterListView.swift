@@ -30,7 +30,9 @@ struct ChapterListView: View {
                             Text(chapter.title)
                                 .font(.default)
                                 .fontWeight(.medium)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(
+                                    latestReadChapterURL == chapter.url ? AppColors.primary : .primary
+                                )
                             
                             Text("\(chapter.view) views")
                                 .font(.footnote)
@@ -53,8 +55,7 @@ struct ChapterListView: View {
                     .padding()
                     .contentShape(RoundedRectangle(cornerRadius: 16))
                     .glassEffect(
-                        latestReadChapterURL == chapter.url ?
-                            .regular.tint(AppColors.primary.opacity(0.3)).interactive() : .regular.interactive(),
+                        .regular.interactive(),
                         in: .rect(cornerRadius: 16)
                     )
                 }

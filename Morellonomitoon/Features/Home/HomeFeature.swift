@@ -102,6 +102,14 @@ struct HomeFeature {
                 )))
                 return .none
                 
+            case let .path(.element(id: _, action: .manga(.genreTapped(param)))):
+                state.path.append(.genericExplore(GenericExploreFeature.State(
+                    id: param.id,
+                    name: param.name,
+                    type: param.type
+                )))
+                return .none
+                
             case let .path(.element(id: _, action: .genericExplore(.mangaTapped(id)))):
                 state.matchedSourceID = id
                 state.path.append(.manga(MangaFeature.State(id: id)))
